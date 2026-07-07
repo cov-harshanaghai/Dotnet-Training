@@ -1,0 +1,21 @@
+﻿@model List<Product>
+@{
+    var cname = TempData["CategoryName"] as string; 
+}
+<div class="container bg-primary-subtle">
+
+  
+
+    <h1>Products filtered by category: @cname </h1>
+    <br />
+    <ul>
+    @{
+        foreach(var p in  Model)
+        {
+            <li class="font-monospace" style="font-size:30px;color:chocolate">@p.ProductName</li>
+            
+        }
+
+    }
+        </ul>
+</div>
