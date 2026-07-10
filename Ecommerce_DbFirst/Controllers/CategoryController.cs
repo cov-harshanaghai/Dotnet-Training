@@ -1,11 +1,13 @@
 using Ecommerce_DBFirst.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ecommerce_DBFirst.Controllers
 {
 
     [Route("/Category")]
+        [Authorize]
     public class CategoryController : Controller
     {
         private readonly EcommerceDbfirstContext _context;
@@ -23,6 +25,7 @@ namespace Ecommerce_DBFirst.Controllers
 
         [Route("add")]
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Add()
         {
             return View();
@@ -30,6 +33,7 @@ namespace Ecommerce_DBFirst.Controllers
 
         [Route("add")]
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Add(Category category)
         {
             if (ModelState.IsValid)
@@ -43,6 +47,7 @@ namespace Ecommerce_DBFirst.Controllers
         }
         [HttpGet]
         [Route("edit/{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.CategoryId == id);
@@ -50,6 +55,7 @@ namespace Ecommerce_DBFirst.Controllers
         }
 
         [Route("edit/{id}")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult Edit(int id , Category category)
         {
@@ -69,6 +75,7 @@ namespace Ecommerce_DBFirst.Controllers
         }
 
         [Route("delete/{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.CategoryId == id);

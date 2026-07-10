@@ -42,11 +42,11 @@ namespace Ecommerce_DBFirst.Controllers
                 var result = await _userManager.CreateAsync(newUser, user.Password);
 
                 if (result.Succeeded)
-
-                {
-                    await _signInManager.SignInAsync(newUser, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
-                }
+{
+    await _userManager.AddToRoleAsync(newUser, "User");
+    await _signInManager.SignInAsync(newUser, isPersistent: false);
+    return RedirectToAction("Index", "Home");
+}
 
                 else
                 {
@@ -98,5 +98,10 @@ namespace Ecommerce_DBFirst.Controllers
 
             
         }
+        [HttpGet]
+public IActionResult AccessDenied()
+{
+    return View();
+}
     }
 }

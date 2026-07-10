@@ -6,7 +6,10 @@
 
 <h2>Product Categories</h2>
 
-<a asp-action="Add" asp-controller="Category" class="btn btn-success mb-3">Add New Category</a>
+@if (User.IsInRole("Admin"))
+{
+    <a asp-action="Add" asp-controller="Category" class="btn btn-success mb-3">Add New Category</a>
+}
 
 <table class="table table-bordered table-striped">
     <thead class="thead-dark">
@@ -25,8 +28,11 @@
                     <td>@category.CategoryId</td>
                     <td>@category.CategoryName</td>
                     <td>
-                        <a asp-controller="Category"  asp-action="Edit" asp-route-id="@category.CategoryId" class="btn btn-outline-warning btn-sm">Edit</a>
-                        <a asp-controller="Category" asp-action="Delete" asp-route-id="@category.CategoryId" class="btn btn-outline-danger btn-sm">Delete</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Category"  asp-action="Edit" asp-route-id="@category.CategoryId" class="btn btn-outline-warning btn-sm">Edit</a>
+                            <a asp-controller="Category" asp-action="Delete" asp-route-id="@category.CategoryId" class="btn btn-outline-danger btn-sm">Delete</a>
+                        }
                     </td>
                 </tr>
             }

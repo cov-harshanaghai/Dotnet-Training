@@ -19,15 +19,18 @@
             <h4 class="text-primary">$@prod.Price</h4>
         </div>
         <div class="card-footer bg-white border-0">
-            <a asp-controller="Product" asp-action="Detail" asp-route-id="@prod.ProductId" class="btn btn-outline-primary mb-3 w-33.33">
+          <a asp-controller="Product" asp-action="Detail" asp-route-id="@prod.ProductId" class="btn btn-outline-primary mb-3 w-33.33">
                 View Details
             </a>
-            <a asp-controller="Product" asp-action="Edit" asp-route-id="@prod.ProductId" class="btn btn-outline-warning mb-3 w-33.33">
-                Edit Product
-            </a>
-            <a asp-controller="Product" asp-action="Delete" asp-route-id="@prod.ProductId" class="btn btn-outline-danger mb-3 w-33.33">
-                Delete Product
-            </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="Product" asp-action="Edit" asp-route-id="@prod.ProductId" class="btn btn-outline-warning mb-3 w-33.33">
+                    Edit Product
+                </a>
+                <a asp-controller="Product" asp-action="Delete" asp-route-id="@prod.ProductId" class="btn btn-outline-danger mb-3 w-33.33">
+                    Delete Product
+                </a>
+            }
             <a asp-controller="Product" asp-action="Buy" asp-route-id="@prod.ProductId" class="btn btn-outline-success mb-3 w-33.33">
                 Place Order
             </a>
