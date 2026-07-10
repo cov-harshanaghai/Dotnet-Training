@@ -10,7 +10,6 @@ namespace Ecommerce_DBFirst.Profiles
         {
             CreateMap<ProductAddDto, Product>();
             CreateMap<ProductUpdateDto, Product>();
-            CreateMap<ProductUpdateDto, Product>().ReverseMap();
         }
     }
 }

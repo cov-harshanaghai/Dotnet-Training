@@ -1,11 +1,10 @@
 using Ecommerce_DBFirst.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace Ecommerce_DBFirst.Controllers
 {
-    [Authorize]
+
     [Route("/Category")]
     public class CategoryController : Controller
     {
@@ -16,7 +15,6 @@ namespace Ecommerce_DBFirst.Controllers
         }
         [Route("index")]
         //[Route("")]
-    
         public IActionResult Index()
         {
             var categories = _context.Categories.ToList();
@@ -25,7 +23,6 @@ namespace Ecommerce_DBFirst.Controllers
 
         [Route("add")]
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public IActionResult Add()
         {
             return View();
@@ -33,7 +30,6 @@ namespace Ecommerce_DBFirst.Controllers
 
         [Route("add")]
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public IActionResult Add(Category category)
         {
             if (ModelState.IsValid)
@@ -47,7 +43,6 @@ namespace Ecommerce_DBFirst.Controllers
         }
         [HttpGet]
         [Route("edit/{id}")]
-        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.CategoryId == id);
@@ -56,7 +51,6 @@ namespace Ecommerce_DBFirst.Controllers
 
         [Route("edit/{id}")]
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id , Category category)
         {
             if (id != category.CategoryId)
@@ -75,7 +69,6 @@ namespace Ecommerce_DBFirst.Controllers
         }
 
         [Route("delete/{id}")]
-        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var category = _context.Categories.FirstOrDefault(c => c.CategoryId == id);
