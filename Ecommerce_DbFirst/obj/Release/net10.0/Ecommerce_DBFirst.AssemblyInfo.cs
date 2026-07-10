@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ecommerce_DBFirst")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ccd63cc6ff1b3eb5d580696105b9d2ed48164bd8")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ecommerce_DBFirst")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ecommerce_DBFirst")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

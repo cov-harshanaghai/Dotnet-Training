@@ -15,10 +15,16 @@
         }
     }
 
-    <h2 class="mb-4  d-inline me-5">Product Listing</h2>
-    <a asp-controller="Product" asp-action="Add" class="btn btn-primary mb-3 w-80">
-        Add New Product
-    </a>
+    <h2 class="mb-4 d-inline me-5">Product Listing</h2>
+
+    
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-controller="Product" asp-action="Add" class="btn btn-primary mb-3 w-80">
+            Add New Product
+        </a>
+    }
+
     <form asp-action="Index" method="get" class="d-inline">
         <select class="btn mb-3" style="border:2px solid green" name="categoryId" onchange="this.form.submit()">
             <option value="">-Sort By Category-</option>
@@ -32,7 +38,6 @@
         </select>
     </form>
 
- 
     <a asp-action="Index" asp-route-sortByPrice="true" class="btn btn-danger mb-3 w-80 me-5">
         Sort by Price
     </a>
@@ -42,42 +47,28 @@
     </form>
 
     <div class="row g-4 mt-5 " id="searchResults">
-
         @await Html.PartialAsync("_ProductListPartial", Model)
     </div>
-
 </div>
 
 @section Scripts {
     <script>
-                console.log("JS loadeed")
-               $(document).ready(function () {
-                              $('#searchForm').on('submit', function (e) {
-                        e.preventDefault();
-                    });
-                   $('#searchBox').on('keyup',function(event){
-                       // event.preventDefault();
-
-                       var searchTerm = $(this).val();
-                       $.ajax({
-                           url: '/product/Search',
-                           type:'GET',
-                           data : {searchTerm : searchTerm},
-                           success :  function(result){
-                               $('#searchResults').html(result);
-                               }
-
-                       }
-
-                       )
-
+        console.log("JS loadeed")
+        $(document).ready(function () {
+            $('#searchForm').on('submit', function (e) {
+                e.preventDefault();
+            });
+            $('#searchBox').on('keyup',function(event){
+                var searchTerm = $(this).val();
+                $.ajax({
+                    url: '/product/Search',
+                    type:'GET',
+                    data : {searchTerm : searchTerm},
+                    success : function(result){
+                        $('#searchResults').html(result);
+                    }
+                })
+            })
         })
-                    })
     </script>
 }
-
-    
-  
-   
-
-
