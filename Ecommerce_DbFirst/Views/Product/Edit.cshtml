@@ -1,4 +1,4 @@
-﻿@model Ecommerce_DBFirst.Models.Product
+﻿@model Ecommerce_DBFirst.Dtos.ProductUpdateDto
 
 
 <div class="container mt-5">
@@ -12,8 +12,8 @@
 
                 <div class="card-body">
 
-                    <form asp-action="Edit" method="post" >
-                        <input type="hidden" asp-for="ProductId" />
+                    <form asp-action="Edit" method="post" asp-route-id="@ViewBag.ProductId" >
+                       
                         <div class="mb-3">
                             <label asp-for="ProductName" class="form-label"></label>
                             <input asp-for="ProductName" class="form-control" />

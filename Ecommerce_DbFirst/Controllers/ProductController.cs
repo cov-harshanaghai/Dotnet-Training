@@ -1,13 +1,14 @@
 using AutoMapper;
 using Ecommerce_DBFirst.Dtos;
 using Ecommerce_DBFirst.Models;
-using Ecommerce_DBFirst.Profiles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Ecommerce_DBFirst.Controllers
 {
     [Route("/product")]
+    [Authorize]
     public class ProductController : Controller
     {
         private readonly EcommerceDbfirstContext _context;
@@ -55,6 +56,7 @@ namespace Ecommerce_DBFirst.Controllers
 
         [Route("add")]
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Add()
         {
             ViewBag.CategoryId = new SelectList(
@@ -67,6 +69,7 @@ namespace Ecommerce_DBFirst.Controllers
 
         [Route("add")]
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Add(ProductAddDto product)
         {
             Product mappedProduct = _mapper.Map<Product>(product);
@@ -111,10 +114,13 @@ namespace Ecommerce_DBFirst.Controllers
 
         [HttpGet]
         [Route("edit/{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
             var product = _context.Products.FirstOrDefault(p => p.ProductId == id);
             if (product == null) return NotFound();
+
+            ViewBag.ProductId = id;   // <-- add this line
 
             ViewBag.CategoryId = new SelectList(
                 _context.Categories,
@@ -126,11 +132,13 @@ namespace Ecommerce_DBFirst.Controllers
 
         [Route("edit/{id}")]
         [HttpPost]
-
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id, ProductUpdateDto updatedProduct)
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.ProductId = id;   // <-- add this line
+
                 ViewBag.CategoryId = new SelectList(
                     _context.Categories,
                     "CategoryId",
@@ -153,6 +161,7 @@ namespace Ecommerce_DBFirst.Controllers
         }
 
         [Route("delete/{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var product = _context.Products.FirstOrDefault(p => p.ProductId == id);

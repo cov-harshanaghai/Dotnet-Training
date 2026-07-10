@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity;
+@using Ecommerce_DBFirst.Models;
+
+@inject SignInManager<AppUser> signInManager;
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -31,25 +35,41 @@
                         <li class="nav-item">
                             <a class="nav-link active" href="/Home/Index">Home</a>
                         </li>
-                  
                         <li class="nav-item">
                             <a class="nav-link" href="/Product/Index">Products</a>
                         </li>
-                      
                         <li class="nav-item">
                             <a class="nav-link" href="/Category/Index">Categories</a>
                         </li>
                     </ul>
 
-                    <div class="d-flex">
-                        <a href="#" class="btn btn-outline-light me-2">Login</a>
-                        <a href="#" class="btn btn-primary">Sign Up</a>
-                    </div>
+                    <ul class="navbar-nav ms-auto">
+                        @if (signInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item d-flex align-items-center">
+                                <span class="nav-link text-light fw-semibold me-2">Hello, @User.Identity?.Name!</span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="nav-link btn btn-link text-light border-0" style="background:none;">Logout</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-light" href="/Account/Register">Register</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-light" href="/Account/Login">Login</a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
         </nav>
-        <!-- Navbar -->
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -61,6 +81,7 @@
             &copy; 2026 - Ecommerce_DBFirst - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
