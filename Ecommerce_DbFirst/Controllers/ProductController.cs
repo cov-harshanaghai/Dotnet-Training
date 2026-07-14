@@ -4,6 +4,7 @@ using Ecommerce_DBFirst.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Ecommerce_DBFirst.Services;
 
 namespace Ecommerce_DBFirst.Controllers
 {
@@ -13,45 +14,32 @@ namespace Ecommerce_DBFirst.Controllers
     {
         private readonly EcommerceDbfirstContext _context;
         private readonly IMapper _mapper;
+        private readonly ILogger<ProductController> _logger;
+        private readonly IProductService _productService;
 
-        public ProductController(EcommerceDbfirstContext context, IMapper mapper)
+        public ProductController(EcommerceDbfirstContext context, IMapper mapper, ILogger<ProductController> logger, IProductService productService)
         {
             _context = context;
             _mapper = mapper;
+            _logger = logger;
+            _productService = productService;
         }
 
         [Route("index")]
         public IActionResult Index(bool sortByPrice, int? categoryId)
         {
-            var products = _context.Products.AsQueryable();
-
-            if (sortByPrice)
-            {
-                products = products.OrderBy(p => p.Price);
-            }
-            if (categoryId.HasValue)
-            {
-                products = products.Where(p => p.CategoryId == categoryId);
-            }
+            
+            var products = _productService.GetAllProducts(sortByPrice, categoryId);
             ViewBag.CategoryOptions = _context.Categories.ToList();
-            return View(products.ToList());
-
+            return View(products);
         }
 
         [HttpGet]
         [Route("Search")]
         public IActionResult Search(string searchTerm)
         {
-
-            var products = _context.Products.AsQueryable();
-
-
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-
-                products = products.Where(p => p.ProductName.Contains(searchTerm));
-            }
-            return PartialView("_ProductListPartial", products.ToList());
+            var products = _productService.SearchProducts(searchTerm);
+            return PartialView("_ProductListPartial", products);
         }
 
         [Route("add")]
@@ -66,48 +54,41 @@ namespace Ecommerce_DBFirst.Controllers
             return View();
         }
 
-
         [Route("add")]
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public IActionResult Add(ProductAddDto product)
         {
-            Product mappedProduct = _mapper.Map<Product>(product);
-            var duplicate = _context.Products
-        .FirstOrDefault(p => p.ProductName.ToLower() == product.ProductName.ToLower());
+            _logger.LogInformation("Admin submitted add product form for {ProductName}.", product.ProductName);
 
-            if (duplicate != null)
+            if (_productService.ProductNameExists(product.ProductName))
             {
+                _logger.LogWarning("Duplicate product attempted: {ProductName}.", product.ProductName);
                 TempData["ErrorMessage"] = "Product already exists";
-
-                ViewBag.CategoryId = new SelectList(
-                    _context.Categories,
-                    "CategoryId",
-                    "CategoryName",
-                    product.CategoryId);
+                ViewBag.CategoryId = new SelectList(_context.Categories, "CategoryId", "CategoryName", product.CategoryId);
                 return View(product);
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                _context.Products.Add(mappedProduct);
-                _context.SaveChanges();
+                var mappedProduct = _mapper.Map<Product>(product);
+                _productService.AddProduct(mappedProduct);
                 TempData["SuccessMessage"] = "Product added successfully";
                 return RedirectToAction("Index");
             }
-
-            ViewBag.CategoryId = new SelectList(
-                _context.Categories,
-                "CategoryId",
-                "CategoryName",
-                product.CategoryId);
-            return View(product);
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failure while adding product {ProductName}.", product.ProductName);
+                TempData["ErrorMessage"] = "An error occurred while adding the product.";
+                ViewBag.CategoryId = new SelectList(_context.Categories, "CategoryId", "CategoryName", product.CategoryId);
+                return View(product);
+            }
         }
 
         [Route("detail/{id}")]
         public IActionResult Detail(int id)
         {
-            var product = _context.Products.FirstOrDefault(p => p.ProductId == id);
+            var product = _productService.GetProductById(id);
             if (product == null) return NotFound();
             return View(product);
         }
@@ -117,11 +98,10 @@ namespace Ecommerce_DBFirst.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
-            var product = _context.Products.FirstOrDefault(p => p.ProductId == id);
+            var product = _productService.GetProductById(id);
             if (product == null) return NotFound();
 
-            ViewBag.ProductId = id;   // <-- add this line
-
+            ViewBag.ProductId = id;
             ViewBag.CategoryId = new SelectList(
                 _context.Categories,
                 "CategoryId",
@@ -131,32 +111,25 @@ namespace Ecommerce_DBFirst.Controllers
         }
 
         [Route("edit/{id}")]
-        [HttpPost]
         [Authorize(Roles = "Admin")]
+        [HttpPost]
         public IActionResult Edit(int id, ProductUpdateDto updatedProduct)
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.ProductId = id;   // <-- add this line
-
+                ViewBag.ProductId = id;
                 ViewBag.CategoryId = new SelectList(
                     _context.Categories,
                     "CategoryId",
                     "CategoryName",
                     updatedProduct.CategoryId);
-
                 return View(updatedProduct);
             }
 
-            var product = _context.Products.FirstOrDefault(p => p.ProductId == id);
+            var product = _mapper.Map<Product>(updatedProduct);
+            product.ProductId = id;
 
-            if (product == null)
-                return NotFound();
-
-            _mapper.Map(updatedProduct, product);
-
-            _context.SaveChanges();
-
+            _productService.UpdateProduct(product);
             return RedirectToAction(nameof(Index));
         }
 
@@ -164,18 +137,17 @@ namespace Ecommerce_DBFirst.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
-            var product = _context.Products.FirstOrDefault(p => p.ProductId == id);
+            var product = _productService.GetProductById(id);
             if (product == null) return NotFound();
 
-            _context.Products.Remove(product);
-            _context.SaveChanges();
+            _productService.DeleteProduct(product);
             return RedirectToAction("Index");
         }
 
         [Route("buy/{id}")]
         public IActionResult Buy(int id)
         {
-            var product = _context.Products.FirstOrDefault(p => p.ProductId == id);
+            var product = _productService.GetProductById(id);
             if (product == null) return NotFound();
 
             Order order = new Order();
@@ -185,9 +157,5 @@ namespace Ecommerce_DBFirst.Controllers
             _context.SaveChanges();
             return View();
         }
-
-
     }
-
-
 }

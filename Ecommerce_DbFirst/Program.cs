@@ -1,57 +1,58 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ecommerce_DBFirst.Models;
+using Ecommerce_DBFirst;
 using Ecommerce_DBFirst.Profiles;
-using Microsoft.AspNetCore.Identity;
+using Ecommerce_DBFirst.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services before Build()
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(MappingProfile).Assembly);
 
 builder.Services.AddDbContext<EcommerceDbfirstContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnectionString")
-    ));
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnectionString")
-    ));
+options.UseSqlServer(builder.Configuration.GetConnectionString("AuthConnectionString")));
+
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+{
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+})
+    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddDefaultTokenProviders();
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
-    options.LogoutPath = "/Account/Logout";
     options.AccessDeniedPath = "/Account/AccessDenied";
-
-
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-    options.SlidingExpiration = true;
-
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.Name = "HarshanaCookie";
 });
 
-   
-builder.Services.AddIdentity<AppUser, IdentityRole>()
-    .AddEntityFrameworkStores<AuthDbContext>();
-   
-
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 var app = builder.Build();
 
-// Configure middleware after Build()
-if (!app.Environment.IsDevelopment())
+var testLogger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+testLogger.LogInformation("Logging is alive and working.");
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    await DbInitializer.SeedRolesAndAdminAsync(scope.ServiceProvider);
 }
 
-app.UseStaticFiles();
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseExceptionHandler("/Home/Error");
+//    app.UseHsts();
+//}
+app.UseExceptionHandler("/Home/Error");
+app.UseStatusCodePagesWithReExecute("/Home/StatusCode/{0}");
 
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

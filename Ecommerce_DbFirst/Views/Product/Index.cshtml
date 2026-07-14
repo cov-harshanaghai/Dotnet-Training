@@ -15,16 +15,13 @@
         }
     }
 
-    <h2 class="mb-4 d-inline me-5">Product Listing</h2>
-
-    
+  <h2 class="mb-4  d-inline me-5">Product Listing</h2>
     @if (User.IsInRole("Admin"))
     {
         <a asp-controller="Product" asp-action="Add" class="btn btn-primary mb-3 w-80">
             Add New Product
         </a>
     }
-
     <form asp-action="Index" method="get" class="d-inline">
         <select class="btn mb-3" style="border:2px solid green" name="categoryId" onchange="this.form.submit()">
             <option value="">-Sort By Category-</option>

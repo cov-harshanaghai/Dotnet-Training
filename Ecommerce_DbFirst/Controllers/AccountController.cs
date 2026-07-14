@@ -9,11 +9,13 @@ namespace Ecommerce_DBFirst.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly ILogger<AccountController> _logger;
 
-        public AccountController(UserManager<AppUser> usermanager, SignInManager<AppUser> signInManager)
+        public AccountController(UserManager<AppUser> usermanager, SignInManager<AppUser> signInManager, ILogger<AccountController> logger)
         {
             _userManager = usermanager;
             _signInManager = signInManager;
+            _logger = logger;
         }
         [HttpGet]
         public async Task<IActionResult> Register()
@@ -43,10 +45,11 @@ namespace Ecommerce_DBFirst.Controllers
 
                 if (result.Succeeded)
 
-                {
-                    await _signInManager.SignInAsync(newUser, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
-                }
+{
+    await _userManager.AddToRoleAsync(newUser, "User");
+    await _signInManager.SignInAsync(newUser, isPersistent: false);
+    return RedirectToAction("Index", "Home");
+}
 
                 else
                 {
@@ -98,5 +101,10 @@ namespace Ecommerce_DBFirst.Controllers
 
             
         }
+        [HttpGet]
+public IActionResult AccessDenied()
+{
+    return View();
+}
     }
 }

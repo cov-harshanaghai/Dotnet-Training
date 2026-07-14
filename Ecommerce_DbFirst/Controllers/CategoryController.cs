@@ -1,25 +1,27 @@
 using Ecommerce_DBFirst.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+using Ecommerce_DBFirst.Services;
 
 namespace Ecommerce_DBFirst.Controllers
 {
-    [Authorize]
     [Route("/Category")]
+    [Authorize]
     public class CategoryController : Controller
     {
-        private readonly EcommerceDbfirstContext _context;
-        public CategoryController(EcommerceDbfirstContext context)
+        private readonly ILogger<CategoryController> _logger;
+        private readonly ICategoryService _categoryService;
+
+        public CategoryController(ILogger<CategoryController> logger, ICategoryService categoryService)
         {
-            _context = context;
+            _logger = logger;
+            _categoryService = categoryService;
         }
+
         [Route("index")]
-        //[Route("")]
-    
         public IActionResult Index()
         {
-            var categories = _context.Categories.ToList();
+            var categories = _categoryService.GetAllCategories();
             return View(categories);
         }
 
@@ -36,28 +38,43 @@ namespace Ecommerce_DBFirst.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Add(Category category)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Categories.Add(category);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+            _logger.LogInformation("Adding a new category: {CategoryName}", category.CategoryName);
 
+            if (_categoryService.CategoryNameExists(category.CategoryName))
+            {
+                _logger.LogWarning("Category name already exists: {CategoryName}", category.CategoryName);
+                ModelState.AddModelError("CategoryName", "Category name already exists.");
+                return View(category);
             }
-            return View(category);
+
+            try
+            {
+                _categoryService.AddCategory(category);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while adding category: {CategoryName}", category.CategoryName);
+                ModelState.AddModelError(string.Empty, "An error occurred while adding the category. Please try again.");
+                return View(category);
+            }
         }
+
         [HttpGet]
         [Route("edit/{id}")]
         [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
-            var category = _context.Categories.FirstOrDefault(c => c.CategoryId == id);
+            var category = _categoryService.GetCategoryById(id);
+            if (category == null) return NotFound();
+
             return View(category);
         }
 
         [Route("edit/{id}")]
-        [HttpPost]
         [Authorize(Roles = "Admin")]
-        public IActionResult Edit(int id , Category category)
+        [HttpPost]
+        public IActionResult Edit(int id, Category category)
         {
             if (id != category.CategoryId)
             {
@@ -68,9 +85,7 @@ namespace Ecommerce_DBFirst.Controllers
                 return RedirectToAction("Index");
             }
 
-            var category1 = _context.Categories.FirstOrDefault(p => p.CategoryId == id);
-            category1.CategoryName = category.CategoryName;
-            _context.SaveChanges();
+            _categoryService.UpdateCategory(category);
             return RedirectToAction("Index");
         }
 
@@ -78,12 +93,11 @@ namespace Ecommerce_DBFirst.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
-            var category = _context.Categories.FirstOrDefault(c => c.CategoryId == id);
-            _context.Categories.Remove(category);
-            _context.SaveChanges();
+            var category = _categoryService.GetCategoryById(id);
+            if (category == null) return NotFound();
+
+            _categoryService.DeleteCategory(category);
             return RedirectToAction("Index");
         }
-   
-
     }
 }
