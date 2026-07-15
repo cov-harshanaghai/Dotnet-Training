@@ -5,3 +5,5 @@ obj/
 .vs/
 *.user
 Ecommerce_DbFirst/Migrations/
+Ecommerce_DbFirst/appsettings.json
+Ecommerce_DbFirst/appsettings.Development.json
