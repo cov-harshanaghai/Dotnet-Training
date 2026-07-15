@@ -2,4 +2,5 @@ bin/
 obj/
 **/bin/
 **/obj/
-appsettings.Development.json.vs/
+.vs/
+*.user
