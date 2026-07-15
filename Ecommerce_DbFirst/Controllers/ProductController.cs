@@ -28,7 +28,7 @@ namespace Ecommerce_DBFirst.Controllers
         [Route("index")]
         public IActionResult Index(bool sortByPrice, int? categoryId)
         {
-            
+
             var products = _productService.GetAllProducts(sortByPrice, categoryId);
             ViewBag.CategoryOptions = _context.Categories.ToList();
             return View(products);
@@ -155,7 +155,7 @@ namespace Ecommerce_DBFirst.Controllers
             order.TotalAmount = (int)product.Price;
             _context.Orders.Add(order);
             _context.SaveChanges();
-            return View();
+            return View(product);
         }
     }
 }
