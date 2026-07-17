@@ -25,10 +25,7 @@ public partial class EcommerceDbfirstContext : DbContext
 
    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 {
-    if (!optionsBuilder.IsConfigured)
-    {
-        optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=EcommerceDBFirst;Trusted_Connection=True;TrustServerCertificate=True");
-    }
+   
 }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

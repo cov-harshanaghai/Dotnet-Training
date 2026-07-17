@@ -4,11 +4,11 @@ namespace Ecommerce_DBFirst.Services
 {
     public interface ICategoryService
     {
-        List<Category> GetAllCategories();
-        Category? GetCategoryById(int id);
-        void UpdateCategory(Category category);
-        bool CategoryNameExists(string categoryName);
-        void AddCategory(Category category);
-        void DeleteCategory(Category category);
+        Task<List<Category>> GetAllCategoriesAsync();
+        Task<Category?> GetCategoryByIdAsync(int id);
+        Task UpdateCategoryAsync(Category category);
+        Task<bool> CategoryNameExistsAsync(string categoryName);
+        Task AddCategoryAsync(Category category);
+        Task DeleteCategoryAsync(Category category);
     }
 }

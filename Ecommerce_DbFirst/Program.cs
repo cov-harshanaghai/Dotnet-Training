@@ -15,7 +15,7 @@ builder.Services.AddDbContext<EcommerceDbfirstContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("AuthConnectionString")));
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
@@ -36,19 +36,21 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 var app = builder.Build();
 
-var testLogger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
-testLogger.LogInformation("Logging is alive and working.");
+app.Logger.LogInformation("Logging is alive and working.");
 using (var scope = app.Services.CreateScope())
 {
     await DbInitializer.SeedRolesAndAdminAsync(scope.ServiceProvider);
 }
 
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseExceptionHandler("/Home/Error");
-//    app.UseHsts();
-//}
-app.UseExceptionHandler("/Home/Error");
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
 app.UseStatusCodePagesWithReExecute("/Home/StatusCode/{0}");
 
 app.UseRouting();

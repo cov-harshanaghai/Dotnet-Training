@@ -1,4 +1,5 @@
 ﻿using Ecommerce_DBFirst.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce_DBFirst.Services
 {
@@ -7,48 +8,61 @@ namespace Ecommerce_DBFirst.Services
         private readonly EcommerceDbfirstContext _context;
         private readonly ILogger<CategoryService> _logger;
 
-        public CategoryService(EcommerceDbfirstContext context , ILogger<CategoryService>logger)
+        public CategoryService(EcommerceDbfirstContext context, ILogger<CategoryService> logger)
         {
             _context = context;
             _logger = logger;
-            
+
         }
-        public List<Category> GetAllCategories()
+        public async Task<List<Category>> GetAllCategoriesAsync()
         {
             _logger.LogInformation("Fetching all categories from the database.");
-            return _context.Categories.ToList();
+            return await _context.Categories.ToListAsync();
         }
-        public bool CategoryNameExists(string categoryName)
+        public async Task<bool> CategoryNameExistsAsync(string categoryName)
         {
             _logger.LogInformation("Checking if category name exists: {CategoryName}", categoryName);
-            return _context.Categories.Any(c => c.CategoryName == categoryName);
+            return await _context.Categories.AnyAsync(c => c.CategoryName == categoryName);
         }
-        public void AddCategory(Category category)
+        public async Task AddCategoryAsync(Category category)
         {
-            _context.Categories.Add(category);
+            await _context.Categories.AddAsync(category);
+            await _context.SaveChangesAsync();
             _logger.LogInformation("Category {CategoryName} added successfully.", category.CategoryName);
-            _context.SaveChanges();
         }
-        public void UpdateCategory(Category category)
+        public async Task UpdateCategoryAsync(Category category)
         {
             _context.Categories.Update(category);
-            _logger.LogInformation("Category {CategoryName} updated successfully.", category.CategoryName);
-            _context.SaveChanges();
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Category {CategoryName} updated successfully.",
+                category.CategoryName);
         }
-        public Category GetCategoryById(int id)
+        public async Task<Category> GetCategoryByIdAsync(int id)
         {
-            var category = _context.Categories.FirstOrDefault(c => c.CategoryId == id);
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.CategoryId == id);
+
             if (category == null)
             {
-                _logger.LogWarning("Category with ID {CategoryId} not found.", id);
+                _logger.LogWarning(
+                    "Category with ID {CategoryId} not found.",
+                    id);
             }
+
             return category;
         }
-        public void DeleteCategory(Category category)
+        public async Task DeleteCategoryAsync(Category category)
         {
             _context.Categories.Remove(category);
-            _logger.LogInformation("Category {CategoryName} deleted successfully.", category.CategoryName);
-            _context.SaveChanges();
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation(
+                "Category {CategoryName} deleted successfully.",
+                category.CategoryName);
         }
     }
 }
+

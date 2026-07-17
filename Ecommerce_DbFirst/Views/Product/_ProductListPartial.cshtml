@@ -38,12 +38,9 @@
                         Edit Product
                     </a>
 
-                    <a asp-controller="Product"
-                       asp-action="Delete"
-                       asp-route-id="@prod.ProductId"
-                       class="btn btn-outline-danger mb-3">
-                        Delete Product
-                    </a>
+                    <form asp-controller="Product" asp-action="Delete" asp-route-id="@prod.ProductId" method="post" class="d-inline" onsubmit="return confirm('Delete this product?');">
+                        <button type="submit" class="btn btn-outline-danger mb-3">Delete Product</button>
+                    </form>
                 }
 
                 <a asp-controller="Product"

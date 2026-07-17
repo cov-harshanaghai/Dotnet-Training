@@ -1,4 +1,7 @@
-﻿using Ecommerce_DBFirst.Models;
+﻿using AutoMapper;
+using Ecommerce_DBFirst.Dtos;
+using Ecommerce_DBFirst.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecommerce_DBFirst.Services
 {
@@ -6,40 +9,54 @@ namespace Ecommerce_DBFirst.Services
     {
         private readonly EcommerceDbfirstContext _context;
         private readonly ILogger<ProductService> _logger;
+        private readonly IMapper _mapper;
 
-        public ProductService(EcommerceDbfirstContext context, ILogger<ProductService> logger)
+        public ProductService(EcommerceDbfirstContext context, ILogger<ProductService> logger,IMapper mapper)
         {
             _context = context;
             _logger = logger;
+            _mapper = mapper;
         }
 
-        public List<Product> GetAllProducts(bool sortByPrice, int? categoryId)
+        public async Task<List<Product> > GetAllProductsAsync(ProductFilter filter)
         {
-            _logger.LogInformation("Fetching all products from the database. SortByPrice: {SortByPrice}, CategoryId: {CategoryId}", sortByPrice, categoryId);
+            _logger.LogInformation("Fetching all products from the database");
             var products = _context.Products.AsQueryable();
+            if (filter.CategoryId.HasValue)
+                products = products.Where(p => p.CategoryId == filter.CategoryId);
+            switch (filter.SortBy)
+            {
+                case ProductSort.Price:
+                    products = products.OrderBy(p => p.Price);
+                    break;
+                case ProductSort.Name:
+                    products = products.OrderBy(p => p.ProductName);
+                    break;
+                case ProductSort.Newest:
+                    products = products.OrderByDescending(p => p.ProductId); 
+                    break;
+                default:
+                    break;
+            }
 
-            if (sortByPrice)
-                products = products.OrderBy(p => p.Price);
+           
 
-            if (categoryId.HasValue)
-                products = products.Where(p => p.CategoryId == categoryId);
-
-            return products.ToList();
+            return await products.ToListAsync();
         }
 
-        public List<Product> SearchProducts(string searchTerm)
+        public async  Task<List<Product>> SearchProductsAsync(string searchTerm)
         {
             var products = _context.Products.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
                 products = products.Where(p => p.ProductName.Contains(searchTerm));
 
-            return products.ToList();
+            return await products.ToListAsync();
         }
 
-        public Product? GetProductById(int id)
+        public async Task<Product?> GetProductByIdAsync(int id)
         {
-            var product = _context.Products.FirstOrDefault(p => p.ProductId == id);
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == id);
 
             if (product == null)
                 _logger.LogWarning("Product with ID {ProductId} not found.", id);
@@ -47,23 +64,23 @@ namespace Ecommerce_DBFirst.Services
             return product;
         }
 
-        public bool ProductNameExists(string productName)
+        public async Task<bool> ProductNameExistsAsync(string productName)
         {
-            return _context.Products
-                .Any(p => p.ProductName.ToLower() == productName.ToLower());
+            return await _context.Products
+                .AnyAsync(p => p.ProductName.ToLower() == productName.ToLower());
         }
 
-        public void AddProduct(Product product)
+        public async Task AddProductAsync(Product product)
         {
-            _context.Products.Add(product);
-            _context.SaveChanges();
+           await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
             _logger.LogInformation("Product {ProductName} saved with ID {ProductId}.",
                 product.ProductName, product.ProductId);
         }
 
-        public void UpdateProduct(Product updatedProduct)
+        public async Task UpdateProductAsync(Product updatedProduct)
         {
-            var existingProduct = _context.Products.FirstOrDefault(p => p.ProductId == updatedProduct.ProductId);
+            var existingProduct =await _context.Products.FirstOrDefaultAsync(p => p.ProductId == updatedProduct.ProductId);
 
             if (existingProduct == null)
             {
@@ -71,20 +88,21 @@ namespace Ecommerce_DBFirst.Services
                 return;
             }
 
-            existingProduct.ProductName = updatedProduct.ProductName;
-            existingProduct.Price = updatedProduct.Price;
-            existingProduct.CategoryId = updatedProduct.CategoryId;
-            existingProduct.StockQuantity = updatedProduct.StockQuantity;
-            existingProduct.ImageUrl = updatedProduct.ImageUrl;
+            //existingProduct.ProductName = updatedProduct.ProductName;
+            //existingProduct.Price = updatedProduct.Price;
+            //existingProduct.CategoryId = updatedProduct.CategoryId;
+            //existingProduct.StockQuantity = updatedProduct.StockQuantity;
+            //existingProduct.ImageUrl = updatedProduct.ImageUrl;
+            _mapper.Map(updatedProduct, existingProduct);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             _logger.LogInformation("Product {ProductId} updated.", existingProduct.ProductId);
         }
 
-        public void DeleteProduct(Product product)
+        public async Task DeleteProductAsync(Product product)
         {
             _context.Products.Remove(product);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             _logger.LogInformation("Product {ProductName} (ID {ProductId}) deleted.",
                 product.ProductName, product.ProductId);
         }

@@ -8,9 +8,8 @@ namespace Ecommerce_DBFirst.Profiles
     {
         public MappingProfile()
         {
-            CreateMap<ProductAddDto, Product>();
-            CreateMap<ProductUpdateDto, Product>();
-            CreateMap<Product, ProductUpdateDto>();
+            CreateMap<ProductDto, Product>();
+            CreateMap<Product, ProductDto>();
         }
     }
 }

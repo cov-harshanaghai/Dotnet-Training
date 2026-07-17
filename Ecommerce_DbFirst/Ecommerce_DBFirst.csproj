@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -7,6 +7,7 @@
     <TargetFramework>net10.0</TargetFramework>
   <!-- your existing properties -->
   <NoWarn>NU1901</NoWarn>
+    <UserSecretsId>e6dbae58-5e5d-4949-92c5-fb8d9d450afe</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

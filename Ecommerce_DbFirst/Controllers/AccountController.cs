@@ -33,23 +33,16 @@ namespace Ecommerce_DBFirst.Controllers
                     Email = user.Email,
                     UserName = user.Email,
 
-
-                    FirstName = "New",
-                    LastName = "User",
-                    City = "Default",
-                    ShippingAddress = "Default",
-                    PostalCode = "00000"
-
                 };
                 var result = await _userManager.CreateAsync(newUser, user.Password);
 
                 if (result.Succeeded)
 
-{
-    await _userManager.AddToRoleAsync(newUser, "User");
-    await _signInManager.SignInAsync(newUser, isPersistent: false);
-    return RedirectToAction("Index", "Home");
-}
+                {
+                    await _userManager.AddToRoleAsync(newUser, "User");
+                    await _signInManager.SignInAsync(newUser, isPersistent: false);
+                    return RedirectToAction("Index", "Home");
+                }
 
                 else
                 {
@@ -73,7 +66,7 @@ namespace Ecommerce_DBFirst.Controllers
         {
             if (ModelState.IsValid)
             {
-                var res =  await _signInManager.PasswordSignInAsync(
+                var res = await _signInManager.PasswordSignInAsync(
                     user.Email, user.Password, user.RememberMe, lockoutOnFailure: false
                     );
                 if (res.Succeeded)
@@ -82,11 +75,11 @@ namespace Ecommerce_DBFirst.Controllers
                 }
                 else
                 {
-                
-                        ModelState.AddModelError("", "Invalid login attempt.");
-                    
+
+                    ModelState.AddModelError("", "Invalid login attempt.");
+
                 }
-                
+
             }
 
             return View(user);
@@ -99,12 +92,12 @@ namespace Ecommerce_DBFirst.Controllers
 
             return RedirectToAction("Index", "Home");
 
-            
+
         }
         [HttpGet]
-public IActionResult AccessDenied()
-{
-    return View();
-}
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }
