@@ -1,0 +1,55 @@
+﻿@model IEnumerable<Product>
+
+@if (!Model.Any())
+{
+    <div class="col-12 text-center text-muted">
+        No products found
+    </div>
+}
+
+@foreach (var prod in Model)
+{
+    <div class="col-md-4 col-lg-3">
+        <div class="card h-100 shadow-sm">
+            <img src="@(string.IsNullOrEmpty(prod.ImageUrl) ? "https://placehold.co/300x200?text=No+Image" : prod.ImageUrl)"
+                 class="card-img-top"
+                 alt="@prod.ProductName" />
+
+            <div class="card-body">
+                <h5 class="card-title">@prod.ProductName</h5>
+                @* <p class="card-text text-muted">@prod.Description</p> *@
+                <h4 class="text-primary">$@prod.Price</h4>
+            </div>
+
+            <div class="card-footer bg-white border-0">
+                <a asp-controller="Product"
+                   asp-action="Detail"
+                   asp-route-id="@prod.ProductId"
+                   class="btn btn-outline-primary mb-3">
+                    View Details
+                </a>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Product"
+                       asp-action="Edit"
+                       asp-route-id="@prod.ProductId"
+                       class="btn btn-outline-warning mb-3">
+                        Edit Product
+                    </a>
+
+                    <form asp-controller="Product" asp-action="Delete" asp-route-id="@prod.ProductId" method="post" class="d-inline" onsubmit="return confirm('Delete this product?');">
+                        <button type="submit" class="btn btn-outline-danger mb-3">Delete Product</button>
+                    </form>
+                }
+
+                <a asp-controller="Product"
+                   asp-action="Buy"
+                   asp-route-id="@prod.ProductId"
+                   class="btn btn-outline-success mb-3">
+                    Place Order
+                </a>
+            </div>
+        </div>
+    </div>
+}

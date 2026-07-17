@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Categories";
+}
+@model List<Category>
+
+<h2>Product Categories</h2>
+
+@if (User.IsInRole("Admin"))
+{
+    <a asp-action="Add" asp-controller="Category" class="btn btn-success mb-3">Add New Category</a>
+}
+
+<table class="table table-bordered table-striped">
+    <thead class="thead-dark">
+        <tr>
+            <th>Id</th>
+            <th>Category Name</th>
+
+            @if (User.IsInRole("Admin"))
+            {
+                <th>Actions</th>
+            }
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var category in Model)
+            {
+                <tr>
+                    <td>@category.CategoryId</td>
+                    <td>@category.CategoryName</td>
+                    <td>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Category" asp-action="Edit" asp-route-id="@category.CategoryId" class="btn btn-outline-warning btn-sm">Edit</a>
+                            <form asp-controller="Category" asp-action="Delete" asp-route-id="@category.CategoryId" method="post" class="d-inline" onsubmit="return confirm('Delete this category?');">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+
+            <tr>
+                <td colspan="3" class="text-center">No categories found</td>
+            </tr>
+        }
+    </tbody>
+</table>

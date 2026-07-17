@@ -2,4 +2,8 @@ bin/
 obj/
 **/bin/
 **/obj/
-appsettings.Development.json.vs/
+.vs/
+*.user
+Ecommerce_DbFirst/Migrations/
+Ecommerce_DbFirst/appsettings.json
+Ecommerce_DbFirst/appsettings.Development.json

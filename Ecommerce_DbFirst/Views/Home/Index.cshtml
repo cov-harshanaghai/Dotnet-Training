@@ -1,0 +1,66 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="container mt-4">
+
+    @{
+        if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    }
+
+    <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold">Welcome to the Store</h1>
+            <p class="col-md-8 fs-4">
+                Browse our full catalogue of products, filter by category, sort by price,
+                or search for exactly what you're looking for.
+            </p>
+            <a asp-controller="Product" asp-action="Index" class="btn btn-primary btn-lg mt-2">
+                Shop Products
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Browse by Category</h5>
+                    <p class="card-text">Quickly narrow down products using the category filter on the product page.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Sort by Price</h5>
+                    <p class="card-text">Find the best deals first, or explore premium options at a glance.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Live Search</h5>
+                    <p class="card-text">Search-as-you-type helps you find products instantly, no page reload needed.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        <p class="text-muted">Signed in as @User.Identity.Name</p>
+    }
+    else
+    {
+        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary">Login</a>
+        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-secondary">Register</a>
+    }
+</div>

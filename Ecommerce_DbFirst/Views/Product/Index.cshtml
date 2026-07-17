@@ -1,0 +1,108 @@
+﻿@{
+    ViewData["Title"] = "Products";
+}
+@model IEnumerable<Product>
+
+<div class="container mt-4">
+
+    @{
+        if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @TempData["SuccessMessage"]
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert"
+                        aria-label="Close"></button>
+            </div>
+        }
+    }
+
+    <h2 class="mb-4 d-inline me-5">Product Listing</h2>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-controller="Product"
+           asp-action="Add"
+           class="btn btn-primary mb-3 w-80">
+            Add New Product
+        </a>
+    }
+
+    <!-- Category + Sort Form -->
+    <form asp-action="Index" method="get" class="d-inline">
+
+        <select class="btn mb-3"
+                style="border:2px solid green"
+                name="CategoryId"
+                asp-items="ViewBag.CategoryId">
+
+            <option value="">-Sort By Category-</option>
+
+        </select>
+
+        <select class="btn btn-danger mb-3 me-5"
+                name="SortBy">
+
+            <option value="None">Sort</option>
+            <option value="Price">Price</option>
+
+        </select>
+
+        <button type="submit" class="btn btn-success mb-3">
+            Apply
+        </button>
+
+    </form>
+
+    <!-- Search -->
+    <form class="d-inline-flex" role="search" id="searchForm">
+        <input class="form-control me-2"
+               id="searchBox"
+               type="search"
+               placeholder="Search"
+               aria-label="Search"
+               name="productName" />
+
+        <button class="btn btn-outline-success"
+                type="submit">
+            Search
+        </button>
+    </form>
+
+    <div class="row g-4 mt-5" id="searchResults">
+        @await Html.PartialAsync("_ProductListPartial", Model)
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('#searchForm').on('submit', function (e) {
+                e.preventDefault();
+            });
+
+            $('#searchBox').on('input', function () {
+
+                $.ajax({
+                    url: '/Product/Search',
+                    type: 'GET',
+                    data: {
+                        searchTerm: $('#searchBox').val()
+                    },
+                    success: function (result) {
+                        $('#searchResults').html(result);
+                    }
+                });
+
+            });
+
+        });
+
+    </script>
+
+}

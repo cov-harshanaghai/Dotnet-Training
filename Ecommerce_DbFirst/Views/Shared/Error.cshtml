@@ -1,0 +1,46 @@
+﻿@model Ecommerce_DBFirst.Models.ErrorViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "_Layout";
+}
+
+<div class="d-flex align-items-center justify-content-center" style="min-height: 60vh;">
+    <div class="text-center p-5" style="max-width: 500px;">
+
+        <div class="mb-4">
+            <span style="font-size: 5rem; line-height: 1;">
+                @if (Model.StatusCode == 404)
+                {
+                    <text>🔍</text>
+                }
+                else if (Model.StatusCode == 403)
+                {
+                    <text>🔒</text>
+                }
+                else
+                {
+                    <text>⚠️</text>
+                }
+            </span>
+        </div>
+
+        <h1 class="display-6 fw-bold mb-3">@Model.Title</h1>
+        <p class="text-muted fs-5 mb-4">@Model.Message</p>
+
+        @if (Model.ShowRequestId)
+        {
+            <p class="text-muted small mb-4">
+                Request ID: <code>@Model.RequestId</code>
+            </p>
+        }
+
+        <div class="d-flex gap-2 justify-content-center">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary px-4">
+                Return Home
+            </a>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary px-4">
+                Go Back
+            </a>
+        </div>
+    </div>
+</div>
