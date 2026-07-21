@@ -1,0 +1,17 @@
+﻿@model Inventory
+
+<h2>Edit Stock Quantity</h2>
+
+<p>Product Id: @Model.ProductId</p>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" name="productId" value="@Model.ProductId" />
+
+    <div class="mb-3">
+        <label>Quantity In Stock</label>
+        <input name="quantityInStock" value="@Model.QuantityInStock" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

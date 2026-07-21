@@ -1,0 +1,47 @@
+﻿@model List<Inventory>
+
+<h2>Inventory</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<a asp-action="Create" class="btn btn-primary mb-3">Add Inventory Record</a>
+
+@if (!Model.Any())
+{
+    <p>No inventory records found, or the Inventory service is currently unavailable.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product Id</th>
+                <th>Quantity In Stock</th>
+                <th>Last Updated</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ProductId</td>
+                    <td>@item.QuantityInStock</td>
+                    <td>@item.LastUpdated</td>
+                    <td>
+                        <a asp-action="Details" asp-route-productId="@item.ProductId">Details</a> |
+                        <a asp-action="Edit" asp-route-productId="@item.ProductId">Edit</a> |
+                        <a asp-action="Delete" asp-route-inventoryId="@item.InventoryId" asp-route-productId="@item.ProductId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

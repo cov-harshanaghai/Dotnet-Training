@@ -16,7 +16,10 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
-
+builder.Services.AddHttpClient<IInventoryApiService, InventoryApiService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7148/");
+});
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
     options.Password.RequireNonAlphanumeric = false;
