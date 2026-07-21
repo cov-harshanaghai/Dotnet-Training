@@ -1,0 +1,19 @@
+﻿@model Inventory
+
+<h2>Add Inventory Record</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label>Product Id</label>
+        <input asp-for="ProductId" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Quantity In Stock</label>
+        <input asp-for="QuantityInStock" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
